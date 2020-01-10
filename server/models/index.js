@@ -11,21 +11,20 @@ module.exports = {
 
       // check if there is a duplicate in user table
       db.query(`SELECT u.id FROM users u where u.name = '${message.username}'`, (err, result, fields) => {
-        if (err && (result.length === 0)) {
+        console.log(`Result Length: ${result.length}`);
+        if (err && result.length !== 1) {
           console.log(err);
-        } else if (result.length > 0) {
-          db.query(`INSERT INTO messages(text, user_id, roomname) VALUES ('${message.message}',
-                (SELECT id from users where users.name = '${message.username}'),
-                '${message.roomname}');`,
-          (err) => {
-            if (err) {
-              console.log(err);
+        } else if (result.length === 1) {
+          db.query(`INSERT INTO messages(text, user_id, roomname) VALUES ("${message.message}", (SELECT id from users where users.name = '${message.username}'), '${message.roomname}');`,
+            (err) => {
+              if (err) {
+                console.log(err);
               // throw new Error('Error Inserting Message to Table: Messages');
-            } else {
-              console.log('Success in Inserting Message to Table: Messages');
-              callback();
-            }
-          });
+              } else {
+                console.log('Success in Inserting Message to Table: Messages');
+                callback();
+              }
+            });
         } else {
           // insert username to user table
           db.query(`INSERT INTO users(name) VALUES ('${message.username}');`, (err) => {
@@ -34,18 +33,16 @@ module.exports = {
             } else {
               console.log(message.message);
               // insert message to mesasage table
-              db.query(`INSERT INTO messages(text, user_id, roomname) VALUES ('${message.message}',
-                (SELECT id from users where users.name = '${message.username}'),
-                '${message.roomname}');`,
-              (err) => {
-                if (err) {
-                  console.log(err);
+              db.query(`INSERT INTO messages(text, user_id, roomname) VALUES ('${message.message}', (SELECT id from users where users.name = '${message.username}'), '${message.roomname}');`,
+                (err) => {
+                  if (err) {
+                    console.log(err);
                   // throw new Error('Error Inserting Message to Table: Messages');
-                } else {
-                  console.log('Success in Inserting Message to Table: Messages');
-                  callback();
-                }
-              });
+                  } else {
+                    console.log('Success in Inserting Message to Table: Messages');
+                    callback();
+                  }
+                });
             }
           });
         }
