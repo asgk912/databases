@@ -2,7 +2,18 @@ var models = require('../models');
 
 module.exports = {
   messages: {
-    get: function (req, res) {}, // a function which handles a get request for all messages
+    get: function (req, res) {
+      models.messages.get((err, result) => {
+        if (err) {
+          throw new Error('Error in Getting All Messages');
+        } else {
+          console.log('RESULT');
+          res.statusCode = 200;
+          res.body = result;
+          res.end();
+        }
+      });
+    }, // a function which handles a get request for all messages
     post: function (req, res) {
       var message = req.body;
       models.messages.post(message, (err) => {
